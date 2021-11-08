@@ -101,35 +101,35 @@ async function getWords(isRhyme) {
     outputDescription.textContent = isRhyme ? `Words that rhyme with ${wordInput.value}: `
     : `Words with a meaning similar to ${wordInput.value}: `;
     let url = 'https://api.datamuse.com/words?';
-    url = isRhyme ? url + 'rel_rhym='+wordInput.value : url + 'ml='+wordInput.value;
+    url = isRhyme ? url + 'rel_rhy='+wordInput.value : url + 'ml='+wordInput.value;
     output.textContent = '...loading';
     try {
         const response = await fetch(url);
         const data = await response.json();
-    } catch (error) {
-        outputDescription.textContent = "Failed to fetch from Datamuse API."
-    }
-    output.textContent = '';
-    if(data.length > 0) {
-        if(isRhyme) {
-            const groups = groupBy(data, 'numSyllables');
-            for(const group in groups) {
-                let groupTitle = document.createElement("h3");
-                groupTitle.textContent = `${group} syllable${addS(Number(group))}:`;
-                output.append(groupTitle);
-                for(const item of groups[group]) {
+        output.textContent = '';
+        if(data.length > 0) {
+            if(isRhyme) {
+                const groups = groupBy(data, 'numSyllables');
+                for(const group in groups) {
+                    let groupTitle = document.createElement("h3");
+                    groupTitle.textContent = `${group} syllable${addS(Number(group))}:`;
+                    output.append(groupTitle);
+                    for(const item of groups[group]) {
+                        createWordItem(item);
+                    }
+                }
+            }
+            else {
+                for(const item of data) {
                     createWordItem(item);
                 }
             }
         }
         else {
-            for(const item of data) {
-                createWordItem(item);
-            }
+            output.textContent = '(no results)';
         }
-    }
-    else {
-        output.textContent = '(no results)';
+    } catch (error) {
+        outputDescription.textContent = "Failed to fetch from Datamuse API."
     }
 }
 
